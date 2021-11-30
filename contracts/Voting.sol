@@ -20,7 +20,7 @@ contract Voting {
     require(hasVoted[msg.sender] == 0);
 
     // votes[_candidateId]++;
-    // hasVoted[msg.sender] = 1;
+    hasVoted[msg.sender] = 1;
 
     // emit VoteMade(_candidateId, msg.sender);
   }
@@ -29,6 +29,6 @@ contract Voting {
 
 // there is 2 candidates OK
 // both candidates start at 0 votes OK
-// each address can only vote once
+// each address can only vote once OK
 // need to keep track of amount of votes for each candidate
 // have an event to trigger when someone votes

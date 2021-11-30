@@ -41,13 +41,16 @@ contract("voting", function (accounts) {
 
   it('can not vote if already has voted', function() {
     return voting.deployed().then((instance) => {
-      votingInstance = instance;
-      votingInstance.hasVoted[accHasVoted] = 1;
-      votingInstance.hasVoted[accHasntVoted] = 0;
-    
+      votingInstance = instance;    
       return votingInstance.vote(1, { from: accHasVoted });
     }).then((receipt) => {
-
+      // assert.equal(number.toNumber(), 1, 'acc has already voted');
+      return votingInstance.vote(1, { from: accHasVoted });
+    }).then(assert.fail).catch((error) => {
+      assert(error.message.toString().indexOf('revert') >= 0, 'cannot vote more than once');
+      return votingInstance.hasVoted(accHasVoted);
+    }).then((number) => {
+      assert.equal(number.toNumber(), 1, 'acc has already voted');
     })
   });
 });
