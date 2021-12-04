@@ -44,7 +44,6 @@ contract("voting", function (accounts) {
       votingInstance = instance;    
       return votingInstance.vote(1, { from: accHasVoted });
     }).then((receipt) => {
-      // assert.equal(number.toNumber(), 1, 'acc has already voted');
       return votingInstance.vote(1, { from: accHasVoted });
     }).then(assert.fail).catch((error) => {
       assert(error.message.toString().indexOf('revert') >= 0, 'cannot vote more than once');
@@ -53,4 +52,28 @@ contract("voting", function (accounts) {
       assert.equal(number.toNumber(), 1, 'acc has already voted');
     })
   });
+
+  it('number of votes for a candidate is updated after a vote', function() {
+    return voting.deployed().then((instance) => {
+      votingInstance = instance;
+      return votingInstance.vote(2, { from: accHasntVoted });
+    }).then((receipt) => {
+      return votingInstance.votes(2);
+    }).then((number) => {
+      assert.equal(number.toNumber(), 1, 'number of votes has incremented');
+    })
+  });
+
+  it('emits event VoteMade when there\'s a new vote', function(){
+    return voting.deployed().then((instance) => {
+      votingInstance = instance;
+      return votingInstance.vote(1, { from: accounts[3] });
+    }).then((receipt) => {
+      assert.equal(receipt.logs.length, 1, 'one event is being triggered upon voting');
+      assert.equal(receipt.logs[0].event, 'VoteMade', 'name of the event is VoteMade');
+      assert.equal(receipt.logs[0].args._for, 'Michael Scott', 'the name of the candidate voted for');
+      assert.equal(receipt.logs[0].args._by, accounts[3], 'the account that voted');
+    })
+  });
+
 });
